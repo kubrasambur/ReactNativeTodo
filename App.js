@@ -16,7 +16,12 @@ export default function App() {
     <Provider store={store}>
       <NativeBaseProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="TodoLists">
+          <Stack.Navigator
+            initialRouteName="TodoLists"
+            screenOptions={{
+              headerTitleAlign: "center",
+            }}
+          >
             <Stack.Screen name="Header" component={Header} />
             <Stack.Screen name="Todos" component={Todos} />
             <Stack.Screen name="NewTodo" component={NewTodo} />
