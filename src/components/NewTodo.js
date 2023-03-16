@@ -1,11 +1,32 @@
-import React from "react";
-import { VStack, Input, Button, Container } from "native-base";
+//REACT
+import React, { useState } from "react";
+//REDUX
+import { store } from "../redux/store";
+import { addTodo } from "../redux/slices/generalSlice";
+//NATIVE-BASE
+import { Input, Button, Container } from "native-base";
+//ID GENERATOR
+import uuid from "react-native-uuid";
 
-const NewTodo = () => {
+const NewTodo = ({ listName }) => {
+  const [todo, setTodo] = useState("");
+
+  const onAddTodoHandle = () => {
+    store.dispatch(addTodo({ id: uuid.v4(), title: todo, listName }));
+    setTodo("");
+  };
+
   return (
-    <Container mb={10} w="100%" ml={20}>
-      <Input variant="underlined" size="md" placeholder="Enter Todo" w="100%" />
-      <Button mt={5} w="100%">
+    <Container mb={10} w="100%" mt={-10}>
+      <Input
+        variant="underlined"
+        size="md"
+        placeholder="Enter Todo"
+        w="100%"
+        value={todo}
+        onChangeText={setTodo}
+      />
+      <Button mt={5} w="100%" onPress={onAddTodoHandle}>
         Add New Todo
       </Button>
     </Container>

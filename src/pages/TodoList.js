@@ -1,21 +1,24 @@
+// REACT
 import React, { useState } from "react";
-
+// REDUX
+import { useSelector } from "react-redux";
+import { store } from "../redux/store";
+import { addList } from "../redux/slices/generalSlice";
+// NATIVE-BASE
 import {
-  Flex,
   Text,
   Button,
   Modal,
   FormControl,
   Input,
-  Center,
   Pressable,
   Container,
+  ScrollView,
 } from "native-base";
-import { useSelector } from "react-redux";
-import { store } from "../redux/store";
-import { addList } from "../redux/slices/generalSlice";
+// ID GENERATOR
+import uuid from "react-native-uuid";
 
-const TodoList = ({ navigation, route }) => {
+const TodoList = ({ navigation }) => {
   const todoLists = useSelector((state) => state?.general?.list);
 
   const [open, setOpen] = useState(false);
@@ -37,14 +40,13 @@ const TodoList = ({ navigation, route }) => {
       mx={10}
       display="flex"
       flex={1}
-      flexDirection="column"
       alignItems="center"
       justifyContent="space-between"
     >
-      <Flex>
-        {todoLists.map((todoList) => {
+      <ScrollView>
+        {todoLists.map((todoList, index) => {
           return (
-            <Pressable onPress={onPressHandle} flexDirection="row">
+            <Pressable onPress={onPressHandle} flexDirection="row" key={index}>
               <Text
                 borderRadius={10}
                 pl={2}
@@ -59,7 +61,7 @@ const TodoList = ({ navigation, route }) => {
             </Pressable>
           );
         })}
-      </Flex>
+      </ScrollView>
 
       <Modal isOpen={open} onClose={() => setOpen(false)} safeAreaTop={true}>
         <Modal.Content maxWidth="350">
@@ -84,7 +86,9 @@ const TodoList = ({ navigation, route }) => {
               <Button
                 onPress={() => {
                   setOpen(false);
-                  store.dispatch(addList({ title: [listName] }));
+                  store.dispatch(
+                    addList({ id: uuid.v4(), title: listName, todos: [] })
+                  );
                   setListName("");
                 }}
               >
