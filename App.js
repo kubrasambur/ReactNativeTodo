@@ -1,6 +1,6 @@
 import { NativeBaseProvider } from "native-base";
 import Header from "./src/components/Header";
-import NewTodo from "./src/components/NewTodo";
+import AddTodoButton from "./src/components/AddTodoButton";
 import Todos from "./src/components/Todos";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -24,7 +24,7 @@ export default function App() {
           >
             <Stack.Screen name="Header" component={Header} />
             <Stack.Screen name="Todos" component={Todos} />
-            <Stack.Screen name="NewTodo" component={NewTodo} />
+            <Stack.Screen name="AddTodoButton" component={AddTodoButton} />
             <Stack.Screen name="TodoLists" component={TodoList} />
             <Stack.Screen name="AddTodo" component={AddTodo} />
           </Stack.Navigator>

@@ -8,24 +8,13 @@ import { Input, Button, Container } from "native-base";
 //ID GENERATOR
 import uuid from "react-native-uuid";
 
-const NewTodo = ({ listName }) => {
-  const [todo, setTodo] = useState("");
-
+const NewTodo = ({ listName, description, openModal }) => {
   const onAddTodoHandle = () => {
-    store.dispatch(addTodo({ id: uuid.v4(), title: todo, listName }));
-    setTodo("");
+    openModal(true);
   };
 
   return (
-    <Container mb={10} w="100%" mt={-10}>
-      <Input
-        variant="underlined"
-        size="md"
-        placeholder="Enter Todo"
-        w="100%"
-        value={todo}
-        onChangeText={setTodo}
-      />
+    <Container mb={10} w="100%" mt={-8}>
       <Button mt={5} w="100%" onPress={onAddTodoHandle}>
         Add New Todo
       </Button>
