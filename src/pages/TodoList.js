@@ -44,7 +44,7 @@ const TodoList = ({ navigation }) => {
       justifyContent="space-between"
     >
       <ScrollView>
-        {todoLists.map((todoList, index) => {
+        {todoLists?.map((todoList, index) => {
           return (
             <Pressable onPress={onPressHandle} flexDirection="row" key={index}>
               <Text
