@@ -14,10 +14,15 @@ import {
   Button,
   Spacer,
   Divider,
+  HStack,
+  Icon,
+  IconButton,
 } from "native-base";
 import { store } from "../redux/store";
-import { addTodo } from "../redux/slices/generalSlice";
+import { addTodo, removeTodo } from "../redux/slices/generalSlice";
 import uuid from "react-native-uuid";
+import { MaterialCommunityIcons, AntDesign, Entypo } from "@expo/vector-icons";
+
 
 const Todos = ({ title, isOpen, setOpen }) => {
   const todos = useSelector((state) => state?.general?.list);
@@ -26,6 +31,15 @@ const Todos = ({ title, isOpen, setOpen }) => {
   const [todoDescription, setTodoDescription] = useState("");
 
   const data = todos.filter((todo) => todo?.title === title)[0]?.todos;
+
+  const deleteTodo = (id) => {
+    store.dispatch(
+      removeTodo({
+        id: id,
+        listName: title,
+      })
+    );
+  };
 
   return (
     <Container w="100%">
@@ -40,9 +54,18 @@ const Todos = ({ title, isOpen, setOpen }) => {
               mb={3}
               key={index}
             >
-              <Text color="coolGray.800" bold p={2}>
-                {todo.title}
-              </Text>
+              <HStack alignItems="center" justifyContent="space-between" pr={3}>
+                <Text color="coolGray.800" bold p={2}>
+                  {todo.title}
+                </Text>
+                <HStack >
+                <IconButton onPress={()=>console.log("mark as checked")} icon={<Icon as={AntDesign} name="checkcircleo" color="coolGray.800"/>}/>
+                <IconButton onPress={()=>console.log("edit")} icon={<Icon as={Entypo} name="edit" color="coolGray.800"/>}/>
+                <IconButton onPress={()=>{
+                  deleteTodo(todo.id);
+                }} icon={<Icon as={AntDesign} name="delete" color="coolGray.800"/>}/>
+                </HStack>
+              </HStack>
               <Divider bg="black" w="93%" ml={2} />
               <Text color="coolGray.800" px={2} pb={2}>
                 {todo.description}

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 // REDUX
 import { useSelector } from "react-redux";
 import { store } from "../redux/store";
-import { addList } from "../redux/slices/generalSlice";
+import { addList, removeList } from "../redux/slices/generalSlice";
 // NATIVE-BASE
 import {
   Text,
@@ -14,9 +14,14 @@ import {
   Pressable,
   Container,
   ScrollView,
+  HStack,
+  Icon,
+  IconButton,
+  VStack,
 } from "native-base";
 // ID GENERATOR
 import uuid from "react-native-uuid";
+import { MaterialCommunityIcons, AntDesign, Entypo } from "@expo/vector-icons";
 
 const TodoList = ({ navigation }) => {
   const todoLists = useSelector((state) => state?.general?.list);
@@ -35,6 +40,14 @@ const TodoList = ({ navigation }) => {
     });
   };
 
+  const deletelist = (id) => {
+    store.dispatch(
+      removeList({
+        id: id,
+      })
+    );
+  };
+
   return (
     <Container
       mx={10}
@@ -46,19 +59,48 @@ const TodoList = ({ navigation }) => {
       <ScrollView>
         {todoLists?.map((todoList, index) => {
           return (
-            <Pressable onPress={onPressHandle} flexDirection="row" key={index}>
-              <Text
-                borderRadius={10}
-                pl={2}
-                mt={5}
-                bg="violet.200"
-                w="100%"
-                h="25"
+            <Container display="flex" flexDirection="row" w="55%" alignItems="center">
+              <Pressable
+                onPress={onPressHandle}
+                flexDirection="row"
+                key={index}
               >
-                {todoList.title}
-                {" List"}
-              </Text>
-            </Pressable>
+                <Text
+                  borderRadius={10}
+                  pl={2}
+                  mt={5}
+                  bg="violet.200"
+                  w="100%"
+                  h="25"
+                >
+                  {todoList.title}
+                  {" List"}
+                </Text>
+              </Pressable>
+
+              <IconButton
+                onPress={() => console.log("mark as checked")}
+                icon={
+                  <Icon
+                    as={AntDesign}
+                    name="checkcircleo"
+                    color="coolGray.800"
+                  />
+                }
+              />
+              <IconButton
+                onPress={() => console.log("edit")}
+                icon={<Icon as={Entypo} name="edit" color="coolGray.800" />}
+              />
+              <IconButton
+                onPress={() => {
+                  deletelist(todoList.id);
+                }}
+                icon={
+                  <Icon as={AntDesign} name="delete" color="coolGray.800" />
+                }
+              />
+            </Container>
           );
         })}
       </ScrollView>
