@@ -14,7 +14,8 @@ export const generalSlice = createSlice({
       state.list.push(action.payload);
     },
     removeList: (state, action) => {
-      state.list = state.list.filter((list) => list.id !== action.payload);
+      state.list = state.list.filter((list) => list.id !== action.payload.id);
+      
     },
     addTodo: (state, action) => {
       state.list.forEach((list) => {
@@ -24,9 +25,14 @@ export const generalSlice = createSlice({
       });
     },
     removeTodo: (state, action) => {
-      state.list.todos = state.list.todos.filter(
-        (todo) => todo.id !== action.payload
-      );
+      state.list.forEach((list) => {
+        if (list.title === action.payload.listName) {
+          list.todos = list.todos.filter(
+            (todo) => todo.id !== action.payload.id
+          );
+        }
+      });
+
     },
   },
 });
