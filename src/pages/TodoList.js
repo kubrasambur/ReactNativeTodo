@@ -35,6 +35,7 @@ const TodoList = ({ navigation }) => {
   const [listName, setListName] = useState("");
   const [EditIsOpen, setEditIsOpen] = useState(false);
   const [listId, setListId] = useState("");
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   const onAddTodoListHandler = () => {
     setOpen(true);
@@ -48,11 +49,8 @@ const TodoList = ({ navigation }) => {
   };
 
   const deleteList = (id) => {
-    store.dispatch(
-      removeList({
-        id: id,
-      })
-    );
+    setOpenDeleteModal(true)
+    setListId(id)
   };
 
   const onEditListName = (todoList) => {
@@ -270,6 +268,42 @@ const TodoList = ({ navigation }) => {
                 }}
               >
                 Save
+              </Button>
+            </Button.Group>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
+
+      <Modal isOpen={openDeleteModal} onClose={() => setOpenDeleteModal(false)} safeAreaTop={true}>
+        <Modal.Content maxWidth="350">
+          <Modal.CloseButton />
+          <Modal.Body>
+            <Text fontSize="18" fontWeight="bold" mr={4} alignSelf="center" >
+            Are you sure you want to delete this list?
+            </Text>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button.Group space={2}>
+              <Button
+                variant="ghost"
+                colorScheme="blueGray"
+                onPress={() => {
+                  setOpenDeleteModal(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onPress={() => {
+                  store.dispatch(
+                    removeList({
+                      id: listId,
+                    })
+                  );
+                  setOpenDeleteModal(false);
+                }}
+              >
+                Delete
               </Button>
             </Button.Group>
           </Modal.Footer>

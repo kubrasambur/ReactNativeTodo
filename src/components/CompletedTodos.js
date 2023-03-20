@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Container,
   ScrollView,
@@ -8,6 +8,8 @@ import {
   Icon,
   IconButton,
   Divider,
+  Modal,
+  Button,
 } from "native-base";
 import { useSelector } from "react-redux";
 import { AntDesign, Entypo } from "@expo/vector-icons";
@@ -18,17 +20,15 @@ const CompletedTodos = ({ route }) => {
   const todos = useSelector((state) => state?.general?.list);
 
   const { title, listTitle } = route.params;
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [todoId, setTodoId] = React.useState("");
 
   const data = todos?.filter((todo) => todo?.title === title || listTitle)[0]
     ?.todos;
 
   const onDeleteTodo = (id) => {
-    store.dispatch(
-      removeTodo({
-        id: id,
-        listName: title,
-      })
-    );
+    setOpenDeleteModal(true)
+    setTodoId(id)
   };
 
   const onRemoveCompleteTodo = (todo) => {
@@ -56,11 +56,7 @@ const CompletedTodos = ({ route }) => {
                 pl={2}
                 mb={3}
                 key={todo.id}
-                style={
-                  todo.completed
-                    ? { opacity: 0.5, backgroundColor: "gray" }
-                    : { textDecorationLine: "none" }
-                }
+                style={{ opacity: 0.5, backgroundColor: "gray" }}
               >
                 <HStack
                   alignItems="center"
@@ -119,6 +115,43 @@ const CompletedTodos = ({ route }) => {
             );
         })}
       </ScrollView>
+
+      <Modal isOpen={openDeleteModal} onClose={() => setOpenDeleteModal(false)} safeAreaTop={true}>
+        <Modal.Content maxWidth="350">
+          <Modal.CloseButton />
+          <Modal.Body>
+            <Text fontSize="18" fontWeight="bold" mr={4} alignSelf="center" >
+            Are you sure you want to delete this todo?
+            </Text>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button.Group space={2}>
+              <Button
+                variant="ghost"
+                colorScheme="blueGray"
+                onPress={() => {
+                  setOpenDeleteModal(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onPress={() => {
+                  store.dispatch(
+                    removeTodo({
+                      id: todoId,
+                      listName: title,
+                    })
+                  );
+                  setOpenDeleteModal(false);
+                }}
+              >
+                Delete
+              </Button>
+            </Button.Group>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
     </Container>
   );
 };

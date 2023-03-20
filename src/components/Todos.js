@@ -37,6 +37,7 @@ const Todos = ({ title, isOpen, setOpen }) => {
   const [todoDescription, setTodoDescription] = useState("");
   const [EditIsOpen, setEditIsOpen] = useState(false);
   const [todoId, setTodoId] = useState("");
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   const data = todos?.filter((todo) => todo?.title === title)[0]?.todos;
 
@@ -59,12 +60,8 @@ const Todos = ({ title, isOpen, setOpen }) => {
   };
 
   const onDeleteTodo = (id) => {
-    store.dispatch(
-      removeTodo({
-        id: id,
-        listName: title,
-      })
-    );
+    setOpenDeleteModal(true)
+    setTodoId(id)
   };
 
   const onCompleteTodo = (todo) => {
@@ -284,6 +281,45 @@ const Todos = ({ title, isOpen, setOpen }) => {
           </Modal.Footer>
         </Modal.Content>
       </Modal>
+
+      <Modal isOpen={openDeleteModal} onClose={() => setOpenDeleteModal(false)} safeAreaTop={true}>
+        <Modal.Content maxWidth="350">
+          <Modal.CloseButton />
+          <Modal.Body>
+            <Text fontSize="18" fontWeight="bold" mr={4} alignSelf="center" >
+            Are you sure you want to delete this todo?
+            </Text>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button.Group space={2}>
+              <Button
+                variant="ghost"
+                colorScheme="blueGray"
+                onPress={() => {
+                  setOpenDeleteModal(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onPress={() => {
+                  store.dispatch(
+                    removeTodo({
+                      id: todoId,
+                      listName: title,
+                    })
+                  );
+                  
+                  setOpenDeleteModal(false);
+                }}
+              >
+                Delete
+              </Button>
+            </Button.Group>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
+
     </Container>
   );
 };

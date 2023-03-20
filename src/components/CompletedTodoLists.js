@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
 import {
@@ -10,21 +10,24 @@ import {
   HStack,
   IconButton,
   Icon,
-  Flex,
+  Button,
+  Modal,
 } from "native-base";
 import { store } from "../redux/store";
 import { removeCompleteList, removeList } from "../redux/slices/generalSlice";
-import { AntDesign, Entypo } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
 const CompletedTodoLists = ({ navigation }) => {
   const todoLists = useSelector((state) => state?.general?.list);
 
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [listId, setListId] = useState("");
+
+  
   const deleteList = (id) => {
-    store.dispatch(
-      removeList({
-        id: id,
-      })
-    );
+    setOpenDeleteModal(true)
+    setListId(id)
+    
   };
 
   const onRemoveCompleteList = (id) => {
@@ -50,36 +53,35 @@ const CompletedTodoLists = ({ navigation }) => {
       alignItems="center"
       justifyContent="space-between"
       mt={10}
-      w="100%"
     >
       <Text fontSize="2xl" fontWeight="bold" mb={5}>
         Completed Lists
       </Text>
-      <ScrollView mb={5}>
+                
+      <ScrollView mb={5} w="100%">
         {todoLists?.map((todoList, index) => {
           if (todoList.completed === true)
             return (
               <VStack
                 display="flex"
                 flexDirection="row"
-                w="74%"
+                w="100%"
                 alignItems="center"
                 key={index + 4}
                 bg="violet.200"
                 style={{ opacity: 0.5, backgroundColor: "gray" }}
                 mb={2}
                 justifyItems="space-between"
-                borderTopLeftRadius={10}
-                borderBottomLeftRadius={10}
+                borderRadius={10}
               >
                 <Pressable
                   onPress={onPressHandle}
                   flexDirection="row"
                   key={index}
+                  w="63%"
                 >
                   <Text
                     pl={2}
-                    w="100%"
                     style={
                       todoList.completed
                         ? { textDecorationLine: "line-through" }
@@ -87,21 +89,14 @@ const CompletedTodoLists = ({ navigation }) => {
                     }
                   >
                     {todoList.title}
-                    {" List"}
+                   
                   </Text>
                 </Pressable>
 
-                <HStack
-                  style={{
-                    backgroundColor: "gray",
-                    borderTopRightRadius: 10,
-                    borderBottomRightRadius: 10,
-                  }}
-                  w="40%"
-                  pr={20}
-                >
+                <HStack pl={5}>
                   <IconButton
                     key={index + 1}
+                    
                     onPress={() => onRemoveCompleteList(todoList.id)}
                     icon={
                       <Icon as={AntDesign} name="back" color="coolGray.800" />
@@ -109,6 +104,7 @@ const CompletedTodoLists = ({ navigation }) => {
                   />
                   <IconButton
                     key={index + 3}
+
                     onPress={() => {
                       deleteList(todoList.id);
                     }}
@@ -121,6 +117,42 @@ const CompletedTodoLists = ({ navigation }) => {
             );
         })}
       </ScrollView>
+
+      <Modal isOpen={openDeleteModal} onClose={() => setOpenDeleteModal(false)} safeAreaTop={true}>
+        <Modal.Content maxWidth="350">
+          <Modal.CloseButton />
+          <Modal.Body>
+            <Text fontSize="18" fontWeight="bold" mr={4} alignSelf="center" >
+            Are you sure you want to delete this list?
+            </Text>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button.Group space={2}>
+              <Button
+                variant="ghost"
+                colorScheme="blueGray"
+                onPress={() => {
+                  setOpenDeleteModal(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onPress={() => {
+                  store.dispatch(
+                    removeList({
+                      id: listId,
+                    })
+                  );
+                  setOpenDeleteModal(false);
+                }}
+              >
+                Delete
+              </Button>
+            </Button.Group>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
     </Container>
   );
 };
