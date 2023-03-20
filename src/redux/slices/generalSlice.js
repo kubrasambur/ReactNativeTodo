@@ -15,7 +15,25 @@ export const generalSlice = createSlice({
     },
     removeList: (state, action) => {
       state.list = state.list.filter((list) => list.id !== action.payload.id);
-      
+    },
+    completeList: (state, action) => {
+      state.list.forEach((list) => {
+        if (list.id === action.payload.id) {
+          list.completed = true;
+        }
+        if (list.completed) {
+          list.todos.forEach((todo) => {
+            todo.completed = true;
+          });
+        }
+      });
+    },
+    editListName: (state, action) => {
+      state.list.forEach((list) => {
+        if (list.id === action.payload.id) {
+          list.title = action.payload.title;
+        }
+      });
     },
     addTodo: (state, action) => {
       state.list.forEach((list) => {
@@ -32,12 +50,43 @@ export const generalSlice = createSlice({
           );
         }
       });
-
+    },
+    completeTodo: (state, action) => {
+      state.list.forEach((list) => {
+        if (list.title === action.payload.listName) {
+          list.todos.forEach((todo) => {
+            if (todo.id === action.payload.id) {
+              todo.completed = true;
+            }
+          });
+        }
+      });
+    },
+    editTodo: (state, action) => {
+      console.log("store", action.payload);
+      state.list.forEach((list) => {
+        if (list.title === action.payload.listName) {
+          list.todos.forEach((todo) => {
+            if (todo.id === action.payload.id) {
+              todo.title = action.payload.title;
+              todo.description = action.payload.description;
+            }
+          });
+        }
+      });
     },
   },
 });
 
-export const { addList, removeList, addTodo, removeTodo } =
-  generalSlice.actions;
+export const {
+  addList,
+  removeList,
+  addTodo,
+  removeTodo,
+  completeTodo,
+  editTodo,
+  completeList,
+  editListName,
+} = generalSlice.actions;
 
 export default generalSlice.reducer;

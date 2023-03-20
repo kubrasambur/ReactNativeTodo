@@ -3,7 +3,12 @@ import React, { useState } from "react";
 // REDUX
 import { useSelector } from "react-redux";
 import { store } from "../redux/store";
-import { addList, removeList } from "../redux/slices/generalSlice";
+import {
+  addList,
+  completeList,
+  editListName,
+  removeList,
+} from "../redux/slices/generalSlice";
 // NATIVE-BASE
 import {
   Text,
@@ -14,20 +19,22 @@ import {
   Pressable,
   Container,
   ScrollView,
-  HStack,
   Icon,
   IconButton,
+  HStack,
   VStack,
 } from "native-base";
 // ID GENERATOR
 import uuid from "react-native-uuid";
-import { MaterialCommunityIcons, AntDesign, Entypo } from "@expo/vector-icons";
+import { AntDesign, Entypo } from "@expo/vector-icons";
 
 const TodoList = ({ navigation }) => {
   const todoLists = useSelector((state) => state?.general?.list);
 
   const [open, setOpen] = useState(false);
   const [listName, setListName] = useState("");
+  const [EditIsOpen, setEditIsOpen] = useState(false);
+  const [listId, setListId] = useState("");
 
   const onAddTodoListHandler = () => {
     setOpen(true);
@@ -40,9 +47,34 @@ const TodoList = ({ navigation }) => {
     });
   };
 
-  const deletelist = (id) => {
+  const deleteList = (id) => {
     store.dispatch(
       removeList({
+        id: id,
+      })
+    );
+  };
+
+  const onEditListName = (todoList) => {
+    console.log(todoList.id);
+    if (todoList.completed) {
+      alert("You can't edit a completed list");
+    } else {
+      store.dispatch(
+        editListName({
+          id: todoList.id,
+          title: todoList.title,
+        })
+      );
+      setListName(todoList.title);
+      setEditIsOpen(true);
+      setListId(todoList.id);
+    }
+  };
+
+  const onCompleteList = (id) => {
+    store.dispatch(
+      completeList({
         id: id,
       })
     );
@@ -55,52 +87,90 @@ const TodoList = ({ navigation }) => {
       flex={1}
       alignItems="center"
       justifyContent="space-between"
+      mt={8}
     >
       <ScrollView>
         {todoLists?.map((todoList, index) => {
           return (
-            <Container display="flex" flexDirection="row" w="55%" alignItems="center">
+            <VStack
+              display="flex"
+              flexDirection="row"
+              w="60%"
+              alignItems="center"
+              key={index + 4}
+              bg="violet.200"
+              style={
+                todoList.completed
+                  ? { opacity: 0.5, backgroundColor: "gray" }
+                  : { textDecorationLine: "none" }
+              }
+              borderTopLeftRadius={10}
+              borderBottomLeftRadius={10}
+              mt={2}
+            >
               <Pressable
                 onPress={onPressHandle}
                 flexDirection="row"
                 key={index}
               >
                 <Text
-                  borderRadius={10}
                   pl={2}
-                  mt={5}
-                  bg="violet.200"
                   w="100%"
-                  h="25"
+                  style={
+                    todoList.completed
+                      ? { textDecorationLine: "line-through" }
+                      : null
+                  }
                 >
                   {todoList.title}
                   {" List"}
                 </Text>
               </Pressable>
 
-              <IconButton
-                onPress={() => console.log("mark as checked")}
-                icon={
-                  <Icon
-                    as={AntDesign}
-                    name="checkcircleo"
-                    color="coolGray.800"
-                  />
+              <HStack
+                style={
+                  todoList.completed
+                    ? {
+                        backgroundColor: "gray",
+                        borderTopRightRadius: 10,
+                        borderBottomRightRadius: 10,
+                      }
+                    : {
+                        borderTopRightRadius: 10,
+                        borderBottomRightRadius: 10,
+                      }
                 }
-              />
-              <IconButton
-                onPress={() => console.log("edit")}
-                icon={<Icon as={Entypo} name="edit" color="coolGray.800" />}
-              />
-              <IconButton
-                onPress={() => {
-                  deletelist(todoList.id);
-                }}
-                icon={
-                  <Icon as={AntDesign} name="delete" color="coolGray.800" />
-                }
-              />
-            </Container>
+                bg="violet.200"
+              >
+                <IconButton
+                  key={index + 2}
+                  onPress={() => onEditListName(todoList)}
+                  icon={<Icon as={Entypo} name="edit" color="coolGray.800" />}
+                />
+
+                <IconButton
+                  key={index + 1}
+                  onPress={() => onCompleteList(todoList.id)}
+                  icon={
+                    <Icon
+                      as={AntDesign}
+                      name="checkcircleo"
+                      color="coolGray.800"
+                    />
+                  }
+                />
+
+                <IconButton
+                  key={index + 3}
+                  onPress={() => {
+                    deleteList(todoList.id);
+                  }}
+                  icon={
+                    <Icon as={AntDesign} name="delete" color="coolGray.800" />
+                  }
+                />
+              </HStack>
+            </VStack>
           );
         })}
       </ScrollView>
@@ -129,7 +199,55 @@ const TodoList = ({ navigation }) => {
                 onPress={() => {
                   setOpen(false);
                   store.dispatch(
-                    addList({ id: uuid.v4(), title: listName, todos: [] })
+                    addList({
+                      id: uuid.v4(),
+                      title: listName,
+                      todos: [],
+                      completed: false,
+                    })
+                  );
+                  setListName("");
+                }}
+              >
+                Save
+              </Button>
+            </Button.Group>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
+
+      <Modal
+        isOpen={EditIsOpen}
+        onClose={() => setEditIsOpen(false)}
+        safeAreaTop={true}
+      >
+        <Modal.Content maxWidth="350">
+          <Modal.CloseButton />
+          <Modal.Header>Edit List Name</Modal.Header>
+          <Modal.Body>
+            <FormControl>
+              <Input value={listName} onChangeText={setListName} />
+            </FormControl>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button.Group space={2}>
+              <Button
+                variant="ghost"
+                colorScheme="blueGray"
+                onPress={() => {
+                  setEditIsOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onPress={() => {
+                  setEditIsOpen(false);
+                  store.dispatch(
+                    editListName({
+                      id: listId,
+                      title: listName,
+                    })
                   );
                   setListName("");
                 }}
