@@ -13,7 +13,7 @@ const AddTodo = ({ route }) => {
   return (
     <Flex flex={1} alignItems="center" justifyContent="space-between">
       <Flex w="100%" alignItems="center">
-        <Header />
+        {/* <Header /> */}
         <Todos title={listTitle} isOpen={open} setOpen={setOpen} />
       </Flex>
       <AddTodoButton listName={listTitle} openModal={setOpen} />
