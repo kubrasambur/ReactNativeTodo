@@ -28,6 +28,18 @@ export const generalSlice = createSlice({
         }
       });
     },
+    removeCompleteList: (state, action) => {
+      state.list.forEach((list) => {
+        if (list.id === action.payload.id) {
+          list.completed = false;
+        }
+        if (list.completed) {
+          list.todos.forEach((todo) => {
+            todo.completed = false;
+          });
+        }
+      });
+    },
     editListName: (state, action) => {
       state.list.forEach((list) => {
         if (list.id === action.payload.id) {
@@ -62,8 +74,19 @@ export const generalSlice = createSlice({
         }
       });
     },
+    removeCompletedTodo: (state, action) => {
+      state.list.forEach((list) => {
+        if (list.title === action.payload.listName) {
+          list.todos.forEach((todo) => {
+            if (todo.id === action.payload.id) {
+              todo.completed = false;
+            }
+          });
+        }
+      });
+    },
+
     editTodo: (state, action) => {
-      console.log("store", action.payload);
       state.list.forEach((list) => {
         if (list.title === action.payload.listName) {
           list.todos.forEach((todo) => {
@@ -87,6 +110,8 @@ export const {
   editTodo,
   completeList,
   editListName,
+  removeCompletedTodo,
+  removeCompleteList,
 } = generalSlice.actions;
 
 export default generalSlice.reducer;

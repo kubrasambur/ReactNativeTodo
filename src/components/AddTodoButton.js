@@ -1,21 +1,16 @@
 //REACT
-import React, { useState } from "react";
-//REDUX
-import { store } from "../redux/store";
-import { addTodo } from "../redux/slices/generalSlice";
+import React from "react";
 //NATIVE-BASE
-import { Input, Button, Container } from "native-base";
-//ID GENERATOR
-import uuid from "react-native-uuid";
+import { Button, Container } from "native-base";
 
-const NewTodo = ({ listName, description, openModal }) => {
+const NewTodo = ({ openModal }) => {
   const onAddTodoHandle = () => {
     openModal(true);
   };
 
   return (
-    <Container mb={10} w="100%" mt={-8}>
-      <Button mt={5} w="100%" onPress={onAddTodoHandle}>
+    <Container w="100%" mt={-5} mb={35}>
+      <Button w="100%" onPress={onAddTodoHandle}>
         Add New Todo
       </Button>
     </Container>

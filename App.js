@@ -8,6 +8,8 @@ import TodoList from "./src/pages/TodoList";
 import AddTodo from "./src/pages/AddTodo";
 import { Provider } from "react-redux";
 import { store } from "./src/redux/store";
+import CompletedTodos from "./src/components/CompletedTodos";
+import CompletedTodoLists from "./src/components/CompletedTodoLists";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -19,7 +21,7 @@ export default function App() {
           <Stack.Navigator
             initialRouteName="TodoLists"
             screenOptions={{
-              headerTitleAlign: "center",
+              headerShown: false,
             }}
           >
             <Stack.Screen name="Header" component={Header} />
@@ -27,6 +29,11 @@ export default function App() {
             <Stack.Screen name="AddTodoButton" component={AddTodoButton} />
             <Stack.Screen name="TodoLists" component={TodoList} />
             <Stack.Screen name="AddTodo" component={AddTodo} />
+            <Stack.Screen
+              name="CompletedTodoLists"
+              component={CompletedTodoLists}
+            />
+            <Stack.Screen name="CompletedTodos" component={CompletedTodos} />
           </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>

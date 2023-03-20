@@ -26,30 +26,36 @@ import {
 } from "../redux/slices/generalSlice";
 import uuid from "react-native-uuid";
 import { AntDesign, Entypo } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const Todos = ({ title, isOpen, setOpen }) => {
   const todos = useSelector((state) => state?.general?.list);
+
+  const navigation = useNavigation();
 
   const [todoName, setTodoName] = useState("");
   const [todoDescription, setTodoDescription] = useState("");
   const [EditIsOpen, setEditIsOpen] = useState(false);
   const [todoId, setTodoId] = useState("");
 
-  const data = todos.filter((todo) => todo?.title === title)[0]?.todos;
+  const data = todos?.filter((todo) => todo?.title === title)[0]?.todos;
 
   const onAddTodo = () => {
-    setOpen(false);
-    store.dispatch(
-      addTodo({
-        id: uuid.v4(),
-        title: todoName,
-        listName: title,
-        description: todoDescription,
-        completed: false,
-      })
-    );
-    setTodoName("");
-    setTodoDescription("");
+    if (!todoName) return alert("Please enter a todo");
+    else {
+      setOpen(false);
+      store.dispatch(
+        addTodo({
+          id: uuid.v4(),
+          title: todoName,
+          listName: title,
+          description: todoDescription,
+          completed: false,
+        })
+      );
+      setTodoName("");
+      setTodoDescription("");
+    }
   };
 
   const onDeleteTodo = (id) => {
@@ -64,7 +70,7 @@ const Todos = ({ title, isOpen, setOpen }) => {
   const onCompleteTodo = (todo) => {
     store.dispatch(
       completeTodo({
-        id: todo.id,
+        id: todo?.id,
         listName: title,
       })
     );
@@ -81,85 +87,117 @@ const Todos = ({ title, isOpen, setOpen }) => {
     }
   };
 
+  const completedTodos = data.filter((todo) => todo?.completed === true).length;
+
   return (
-    <Container w="100%">
-      <ScrollView w="100%" h="75%" mb={0}>
+    <Container w="100%" mt={10}>
+      <Text fontSize="2xl" fontWeight="bold" alignSelf="center">
+        Active Todos
+      </Text>
+      <ScrollView w="100%" h="80%" mt={5}>
         {data?.map((todo) => {
-          return (
-            <VStack
-              bg="violet.200"
-              w="100%"
-              borderRadius={10}
-              pl={2}
-              mb={3}
-              key={todo.id}
-              style={
-                todo.completed
-                  ? { opacity: 0.5, backgroundColor: "gray" }
-                  : { textDecorationLine: "none" }
-              }
-            >
-              <HStack alignItems="center" justifyContent="space-between" pr={3}>
+          if (!todo.completed && !todo.listname?.completed)
+            return (
+              <VStack
+                bg="violet.200"
+                w="100%"
+                borderRadius={10}
+                pl={2}
+                mb={3}
+                key={todo.id}
+                style={
+                  todo.completed
+                    ? { opacity: 0.5, backgroundColor: "gray" }
+                    : { textDecorationLine: "none" }
+                }
+              >
+                <HStack
+                  alignItems="center"
+                  justifyContent="space-between"
+                  pr={3}
+                >
+                  <Text
+                    color="coolGray.800"
+                    bold
+                    p={2}
+                    style={
+                      todo.completed
+                        ? { textDecorationLine: "line-through" }
+                        : null
+                    }
+                    w="61%"
+                  >
+                    {todo.title}
+                  </Text>
+                  <HStack>
+                    <IconButton
+                      onPress={() => onCompleteTodo(todo)}
+                      icon={
+                        <Icon
+                          as={AntDesign}
+                          name="checkcircleo"
+                          color="coolGray.800"
+                        />
+                      }
+                    />
+                    <IconButton
+                      onPress={() => onEditTodo(todo)}
+                      icon={
+                        <Icon as={Entypo} name="edit" color="coolGray.800" />
+                      }
+                    />
+                    <IconButton
+                      onPress={() => {
+                        onDeleteTodo(todo.id);
+                      }}
+                      icon={
+                        <Icon
+                          as={AntDesign}
+                          name="delete"
+                          color="coolGray.800"
+                        />
+                      }
+                    />
+                  </HStack>
+                </HStack>
+                <Divider bg="black" w="94%" ml={2} />
                 <Text
                   color="coolGray.800"
-                  bold
-                  p={2}
+                  px={2}
+                  pb={2}
                   style={
                     todo.completed
                       ? { textDecorationLine: "line-through" }
                       : null
                   }
-                  w="61%"
                 >
-                  {todo.title}
+                  {todo.description}
                 </Text>
-                <HStack>
-                  <IconButton
-                    onPress={() => onCompleteTodo(todo)}
-                    icon={
-                      <Icon
-                        as={AntDesign}
-                        name="checkcircleo"
-                        color="coolGray.800"
-                      />
-                    }
-                  />
-                  <IconButton
-                    onPress={() => onEditTodo(todo)}
-                    icon={<Icon as={Entypo} name="edit" color="coolGray.800" />}
-                  />
-                  <IconButton
-                    onPress={() => {
-                      onDeleteTodo(todo.id);
-                    }}
-                    icon={
-                      <Icon as={AntDesign} name="delete" color="coolGray.800" />
-                    }
-                  />
-                </HStack>
-              </HStack>
-              <Divider bg="black" w="94%" ml={2} />
-              <Text
-                color="coolGray.800"
-                px={2}
-                pb={2}
-                style={
-                  todo.completed ? { textDecorationLine: "line-through" } : null
-                }
-              >
-                {todo.description}
-              </Text>
-            </VStack>
-          );
+              </VStack>
+            );
         })}
       </ScrollView>
+
+      {completedTodos > 0 ? (
+        <Button
+          onPress={() =>
+            navigation.navigate("CompletedTodos", { title: title })
+          }
+          w="100%"
+          _text={{ fontSize: "15" }}
+          mt="3%"
+        >
+          Check Completed Todos
+        </Button>
+      ) : null}
+
       <Modal isOpen={isOpen} onClose={() => setOpen(false)}>
         <Modal.Content maxWidth="350">
           <Modal.CloseButton />
           <Modal.Header>Enter new Todo</Modal.Header>
           <Modal.Body>
             <FormControl>
-              <FormControl.Label>Name</FormControl.Label>
+              <FormControl.Label>Title</FormControl.Label>
               <Input value={todoName} onChangeText={setTodoName} />
             </FormControl>
             <FormControl>

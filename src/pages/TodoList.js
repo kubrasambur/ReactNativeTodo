@@ -56,7 +56,6 @@ const TodoList = ({ navigation }) => {
   };
 
   const onEditListName = (todoList) => {
-    console.log(todoList.id);
     if (todoList.completed) {
       alert("You can't edit a completed list");
     } else {
@@ -79,101 +78,128 @@ const TodoList = ({ navigation }) => {
       })
     );
   };
+  const completedList = todoLists.filter(
+    (todoList) => todoList.completed === true
+  ).length;
+
+  const onSaveTodoList = () => {
+    if (listName === "") {
+      alert("Please enter a list name");
+    } else {
+      setOpen(false);
+      store.dispatch(
+        addList({
+          id: uuid.v4(),
+          title: listName,
+          todos: [],
+          completed: false,
+        })
+      );
+      setListName("");
+    }
+  };
 
   return (
-    <Container
-      mx={10}
-      display="flex"
-      flex={1}
-      alignItems="center"
-      justifyContent="space-between"
-      mt={8}
-    >
-      <ScrollView>
+    <Container mx={10} display="flex" flex={1} alignItems="center" mt={10}>
+      <Text fontSize="2xl" fontWeight="bold" mb={5}>
+        Active Lists
+      </Text>
+      <ScrollView mb={3}>
         {todoLists?.map((todoList, index) => {
-          return (
-            <VStack
-              display="flex"
-              flexDirection="row"
-              w="60%"
-              alignItems="center"
-              key={index + 4}
-              bg="violet.200"
-              style={
-                todoList.completed
-                  ? { opacity: 0.5, backgroundColor: "gray" }
-                  : { textDecorationLine: "none" }
-              }
-              borderTopLeftRadius={10}
-              borderBottomLeftRadius={10}
-              mt={2}
-            >
-              <Pressable
-                onPress={onPressHandle}
+          if (todoList.completed === false)
+            return (
+              <VStack
+                display="flex"
                 flexDirection="row"
-                key={index}
-              >
-                <Text
-                  pl={2}
-                  w="100%"
-                  style={
-                    todoList.completed
-                      ? { textDecorationLine: "line-through" }
-                      : null
-                  }
-                >
-                  {todoList.title}
-                  {" List"}
-                </Text>
-              </Pressable>
-
-              <HStack
+                w="60%"
+                alignItems="center"
+                key={index + 4}
+                bg="violet.200"
                 style={
                   todoList.completed
-                    ? {
-                        backgroundColor: "gray",
-                        borderTopRightRadius: 10,
-                        borderBottomRightRadius: 10,
-                      }
-                    : {
-                        borderTopRightRadius: 10,
-                        borderBottomRightRadius: 10,
-                      }
+                    ? { opacity: 0.5, backgroundColor: "gray" }
+                    : { textDecorationLine: "none" }
                 }
-                bg="violet.200"
+                borderTopLeftRadius={10}
+                borderBottomLeftRadius={10}
+                mb={2}
               >
-                <IconButton
-                  key={index + 2}
-                  onPress={() => onEditListName(todoList)}
-                  icon={<Icon as={Entypo} name="edit" color="coolGray.800" />}
-                />
+                <Pressable
+                  onPress={onPressHandle}
+                  flexDirection="row"
+                  key={index}
+                >
+                  <Text
+                    pl={2}
+                    w="100%"
+                    style={
+                      todoList.completed
+                        ? { textDecorationLine: "line-through" }
+                        : null
+                    }
+                  >
+                    {todoList.title}
+                  </Text>
+                </Pressable>
 
-                <IconButton
-                  key={index + 1}
-                  onPress={() => onCompleteList(todoList.id)}
-                  icon={
-                    <Icon
-                      as={AntDesign}
-                      name="checkcircleo"
-                      color="coolGray.800"
-                    />
+                <HStack
+                  style={
+                    todoList.completed
+                      ? {
+                          backgroundColor: "gray",
+                          borderTopRightRadius: 10,
+                          borderBottomRightRadius: 10,
+                        }
+                      : {
+                          borderTopRightRadius: 10,
+                          borderBottomRightRadius: 10,
+                        }
                   }
-                />
+                  bg="violet.200"
+                >
+                  <IconButton
+                    key={index + 2}
+                    onPress={() => onEditListName(todoList)}
+                    icon={<Icon as={Entypo} name="edit" color="coolGray.800" />}
+                  />
 
-                <IconButton
-                  key={index + 3}
-                  onPress={() => {
-                    deleteList(todoList.id);
-                  }}
-                  icon={
-                    <Icon as={AntDesign} name="delete" color="coolGray.800" />
-                  }
-                />
-              </HStack>
-            </VStack>
-          );
+                  <IconButton
+                    key={index + 1}
+                    onPress={() => onCompleteList(todoList.id)}
+                    icon={
+                      <Icon
+                        as={AntDesign}
+                        name="checkcircleo"
+                        color="coolGray.800"
+                      />
+                    }
+                  />
+
+                  <IconButton
+                    key={index + 3}
+                    onPress={() => {
+                      deleteList(todoList.id);
+                    }}
+                    icon={
+                      <Icon as={AntDesign} name="delete" color="coolGray.800" />
+                    }
+                  />
+                </HStack>
+              </VStack>
+            );
         })}
       </ScrollView>
+
+      {completedList > 0 ? (
+        <Button
+          onPress={() => navigation.navigate("CompletedTodoLists")}
+          w="100%"
+          mb={3}
+          _text={{ fontSize: "15" }}
+        >
+          Check Completed Lists
+        </Button>
+      ) : null}
 
       <Modal isOpen={open} onClose={() => setOpen(false)} safeAreaTop={true}>
         <Modal.Content maxWidth="350">
@@ -197,16 +223,7 @@ const TodoList = ({ navigation }) => {
               </Button>
               <Button
                 onPress={() => {
-                  setOpen(false);
-                  store.dispatch(
-                    addList({
-                      id: uuid.v4(),
-                      title: listName,
-                      todos: [],
-                      completed: false,
-                    })
-                  );
-                  setListName("");
+                  onSaveTodoList();
                 }}
               >
                 Save
