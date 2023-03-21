@@ -10,12 +10,11 @@ import {
   HStack,
   IconButton,
   Icon,
-  Button,
-  Modal,
 } from "native-base";
 import { store } from "../redux/store";
 import { removeCompleteList, removeList } from "../redux/slices/generalSlice";
 import { AntDesign } from "@expo/vector-icons";
+import CustomModalDelete from "./custom/CustomModalDelete";
 
 const CompletedTodoLists = ({ navigation }) => {
   const todoLists = useSelector((state) => state?.general?.list);
@@ -23,11 +22,9 @@ const CompletedTodoLists = ({ navigation }) => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [listId, setListId] = useState("");
 
-  
   const deleteList = (id) => {
-    setOpenDeleteModal(true)
-    setListId(id)
-    
+    setOpenDeleteModal(true);
+    setListId(id);
   };
 
   const onRemoveCompleteList = (id) => {
@@ -45,6 +42,15 @@ const CompletedTodoLists = ({ navigation }) => {
     });
   };
 
+  const handleDeleteOnPress = () => {
+    store.dispatch(
+      removeList({
+        id: listId,
+      })
+    );
+    setOpenDeleteModal(false);
+  };
+
   return (
     <Container
       mx={10}
@@ -52,12 +58,11 @@ const CompletedTodoLists = ({ navigation }) => {
       flex={1}
       alignItems="center"
       justifyContent="space-between"
-      mt={10}
     >
       <Text fontSize="2xl" fontWeight="bold" mb={5}>
         Completed Lists
       </Text>
-                
+
       <ScrollView mb={5} w="100%">
         {todoLists?.map((todoList, index) => {
           if (todoList.completed === true)
@@ -89,14 +94,12 @@ const CompletedTodoLists = ({ navigation }) => {
                     }
                   >
                     {todoList.title}
-                   
                   </Text>
                 </Pressable>
 
                 <HStack pl={5}>
                   <IconButton
                     key={index + 1}
-                    
                     onPress={() => onRemoveCompleteList(todoList.id)}
                     icon={
                       <Icon as={AntDesign} name="back" color="coolGray.800" />
@@ -104,7 +107,6 @@ const CompletedTodoLists = ({ navigation }) => {
                   />
                   <IconButton
                     key={index + 3}
-
                     onPress={() => {
                       deleteList(todoList.id);
                     }}
@@ -118,41 +120,13 @@ const CompletedTodoLists = ({ navigation }) => {
         })}
       </ScrollView>
 
-      <Modal isOpen={openDeleteModal} onClose={() => setOpenDeleteModal(false)} safeAreaTop={true}>
-        <Modal.Content maxWidth="350">
-          <Modal.CloseButton />
-          <Modal.Body>
-            <Text fontSize="18" fontWeight="bold" mr={4} alignSelf="center" >
-            Are you sure you want to delete this list?
-            </Text>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="ghost"
-                colorScheme="blueGray"
-                onPress={() => {
-                  setOpenDeleteModal(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onPress={() => {
-                  store.dispatch(
-                    removeList({
-                      id: listId,
-                    })
-                  );
-                  setOpenDeleteModal(false);
-                }}
-              >
-                Delete
-              </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
+      {/* Delete Todo Modal */}
+      <CustomModalDelete
+        isOpen={openDeleteModal}
+        setOpen={() => setOpenDeleteModal(false)}
+        handleOnPress={handleDeleteOnPress}
+        text="Are you sure you want to delete this list?"
+      />
     </Container>
   );
 };

@@ -12,10 +12,6 @@ import {
 // NATIVE-BASE
 import {
   Text,
-  Button,
-  Modal,
-  FormControl,
-  Input,
   Pressable,
   Container,
   ScrollView,
@@ -27,6 +23,9 @@ import {
 // ID GENERATOR
 import uuid from "react-native-uuid";
 import { AntDesign, Entypo } from "@expo/vector-icons";
+import CustomModalAddEditTodoList from "../components/custom/CustomModalAddEditTodoList";
+import CustomModalDelete from "../components/custom/CustomModalDelete";
+import CustomButton from "../components/custom/CustomButton";
 
 const TodoList = ({ navigation }) => {
   const todoLists = useSelector((state) => state?.general?.list);
@@ -37,20 +36,16 @@ const TodoList = ({ navigation }) => {
   const [listId, setListId] = useState("");
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-  const onAddTodoListHandler = () => {
-    setOpen(true);
-  };
-
   const onPressHandle = (e) => {
     const val = e.target._internalFiberInstanceHandleDEV.child.memoizedProps;
-    navigation.navigate("AddTodo", {
+    navigation.navigate("Todos", {
       listTitle: val,
     });
   };
 
   const deleteList = (id) => {
-    setOpenDeleteModal(true)
-    setListId(id)
+    setOpenDeleteModal(true);
+    setListId(id);
   };
 
   const onEditListName = (todoList) => {
@@ -97,8 +92,28 @@ const TodoList = ({ navigation }) => {
     }
   };
 
+  const handleOnEditListName = () => {
+    setEditIsOpen(false);
+    store.dispatch(
+      editListName({
+        id: listId,
+        title: listName,
+      })
+    );
+    setListName("");
+  };
+
+  handleDeleteList = () => {
+    store.dispatch(
+      removeList({
+        id: listId,
+      })
+    );
+    setOpenDeleteModal(false);
+  };
+
   return (
-    <Container mx={10} display="flex" flex={1} alignItems="center" mt={10}>
+    <Container ml={10} display="flex" flex={1} alignItems="center">
       <Text fontSize="2xl" fontWeight="bold" mb={5}>
         Active Lists
       </Text>
@@ -128,7 +143,7 @@ const TodoList = ({ navigation }) => {
                   key={index}
                 >
                   <Text
-                    pl={2}
+                    pl={4}
                     w="100%"
                     style={
                       todoList.completed
@@ -188,137 +203,41 @@ const TodoList = ({ navigation }) => {
         })}
       </ScrollView>
 
+      {/* Add Todo  List */}
+      <CustomModalAddEditTodoList
+        isOpen={open}
+        setOpen={() => setOpen(false)}
+        headerText="Type a list name"
+        value={listName}
+        onChangeText={setListName}
+        handleOnPress={() => onSaveTodoList()}
+      />
+
+      {/* Edit Todo  List */}
+      <CustomModalAddEditTodoList
+        isOpen={EditIsOpen}
+        setOpen={() => setEditIsOpen(false)}
+        headerText="Type a list name"
+        value={listName}
+        onChangeText={setListName}
+        handleOnPress={() => handleOnEditListName()}
+      />
+
+      {/* Delete Todo  List */}
+      <CustomModalDelete
+        isOpen={openDeleteModal}
+        setOpen={() => setOpenDeleteModal(false)}
+        text="Are you sure you want to delete this list?"
+        handleOnPress={() => handleDeleteList()}
+      />
       {completedList > 0 ? (
-        <Button
-          onPress={() => navigation.navigate("CompletedTodoLists")}
-          w="100%"
-          mb={3}
-          _text={{ fontSize: "15" }}
-        >
-          Check Completed Lists
-        </Button>
+        <CustomButton
+          title="Check Completed Lists"
+          handleOnPress={() => navigation.navigate("CompletedTodoLists")}
+        />
       ) : null}
 
-      <Modal isOpen={open} onClose={() => setOpen(false)} safeAreaTop={true}>
-        <Modal.Content maxWidth="350">
-          <Modal.CloseButton />
-          <Modal.Header>Type new list's name</Modal.Header>
-          <Modal.Body>
-            <FormControl>
-              <Input value={listName} onChangeText={setListName} />
-            </FormControl>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="ghost"
-                colorScheme="blueGray"
-                onPress={() => {
-                  setOpen(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onPress={() => {
-                  onSaveTodoList();
-                }}
-              >
-                Save
-              </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
-
-      <Modal
-        isOpen={EditIsOpen}
-        onClose={() => setEditIsOpen(false)}
-        safeAreaTop={true}
-      >
-        <Modal.Content maxWidth="350">
-          <Modal.CloseButton />
-          <Modal.Header>Edit List Name</Modal.Header>
-          <Modal.Body>
-            <FormControl>
-              <Input value={listName} onChangeText={setListName} />
-            </FormControl>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="ghost"
-                colorScheme="blueGray"
-                onPress={() => {
-                  setEditIsOpen(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onPress={() => {
-                  setEditIsOpen(false);
-                  store.dispatch(
-                    editListName({
-                      id: listId,
-                      title: listName,
-                    })
-                  );
-                  setListName("");
-                }}
-              >
-                Save
-              </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
-
-      <Modal isOpen={openDeleteModal} onClose={() => setOpenDeleteModal(false)} safeAreaTop={true}>
-        <Modal.Content maxWidth="350">
-          <Modal.CloseButton />
-          <Modal.Body>
-            <Text fontSize="18" fontWeight="bold" mr={4} alignSelf="center" >
-            Are you sure you want to delete this list?
-            </Text>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="ghost"
-                colorScheme="blueGray"
-                onPress={() => {
-                  setOpenDeleteModal(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onPress={() => {
-                  store.dispatch(
-                    removeList({
-                      id: listId,
-                    })
-                  );
-                  setOpenDeleteModal(false);
-                }}
-              >
-                Delete
-              </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
-
-      <Button
-        _text={{ fontSize: "20" }}
-        p={1}
-        mb={10}
-        w="100%"
-        onPress={onAddTodoListHandler}
-      >
-        Add new list
-      </Button>
+      <CustomButton title="Add new list" handleOnPress={() => setOpen(true)} />
     </Container>
   );
 };
