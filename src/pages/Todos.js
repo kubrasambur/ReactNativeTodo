@@ -8,10 +8,6 @@ import {
   Text,
   Container,
   ScrollView,
-  Modal,
-  FormControl,
-  Input,
-  Button,
   Divider,
   HStack,
   Icon,
@@ -27,9 +23,13 @@ import {
 import uuid from "react-native-uuid";
 import { AntDesign, Entypo } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import CustomModalAddEditTodo from "../components/custom/CustomModalAddEditTodo";
+import CustomModalDelete from "../components/custom/CustomModalDelete";
+import CustomButton from "../components/custom/CustomButton";
 
-const Todos = ({ title, isOpen, setOpen }) => {
+const Todos = ({ route }) => {
   const todos = useSelector((state) => state?.general?.list);
+  const { listTitle } = route.params;
 
   const navigation = useNavigation();
 
@@ -38,8 +38,9 @@ const Todos = ({ title, isOpen, setOpen }) => {
   const [EditIsOpen, setEditIsOpen] = useState(false);
   const [todoId, setTodoId] = useState("");
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const data = todos?.filter((todo) => todo?.title === title)[0]?.todos;
+  const data = todos?.filter((todo) => todo?.title === listTitle)[0]?.todos;
 
   const onAddTodo = () => {
     if (!todoName) return alert("Please enter a todo");
@@ -49,7 +50,7 @@ const Todos = ({ title, isOpen, setOpen }) => {
         addTodo({
           id: uuid.v4(),
           title: todoName,
-          listName: title,
+          listName: listTitle,
           description: todoDescription,
           completed: false,
         })
@@ -60,15 +61,15 @@ const Todos = ({ title, isOpen, setOpen }) => {
   };
 
   const onDeleteTodo = (id) => {
-    setOpenDeleteModal(true)
-    setTodoId(id)
+    setOpenDeleteModal(true);
+    setTodoId(id);
   };
 
   const onCompleteTodo = (todo) => {
     store.dispatch(
       completeTodo({
         id: todo?.id,
-        listName: title,
+        listName: listTitle,
       })
     );
   };
@@ -84,14 +85,39 @@ const Todos = ({ title, isOpen, setOpen }) => {
     }
   };
 
+  const handleEditOnPress = () => {
+    store.dispatch(
+      editTodo({
+        id: todoId,
+        listName: listTitle,
+        title: todoName,
+        description: todoDescription,
+      })
+    );
+    setTodoName("");
+    setTodoDescription("");
+    setEditIsOpen(false);
+  };
+
+  const handleDeleteOnPress = () => {
+    store.dispatch(
+      removeTodo({
+        id: todoId,
+        listName: listTitle,
+      })
+    );
+
+    setOpenDeleteModal(false);
+  };
+
   const completedTodos = data.filter((todo) => todo?.completed === true).length;
 
   return (
-    <Container w="100%" mt={10}>
+    <Container w="100%" ml={10} display="flex" flex={1} alignItems="center">
       <Text fontSize="2xl" fontWeight="bold" alignSelf="center">
         Active Todos
       </Text>
-      <ScrollView w="100%" h="80%" mt={5}>
+      <ScrollView w="100%" h="73%" mt={5}>
         {data?.map((todo) => {
           if (!todo.completed && !todo.listname?.completed)
             return (
@@ -175,151 +201,52 @@ const Todos = ({ title, isOpen, setOpen }) => {
         })}
       </ScrollView>
 
+      {/* Add Todo Modal */}
+      <CustomModalAddEditTodo
+        Description="Description"
+        firstValue={todoName}
+        firstOnChangeText={setTodoName}
+        secondValue={todoDescription}
+        secondOnChangeText={setTodoDescription}
+        handleOnPress={onAddTodo}
+        isOpen={open}
+        setOpen={() => setOpen(false)}
+        headerText="Enter new Todo"
+        title="Title"
+      />
+
+      {/* Edit Todo Modal */}
+      <CustomModalAddEditTodo
+        Description="Description"
+        firstValue={todoName}
+        firstOnChangeText={setTodoName}
+        secondValue={todoDescription}
+        secondOnChangeText={setTodoDescription}
+        handleOnPress={handleEditOnPress}
+        isOpen={EditIsOpen}
+        setOpen={() => setEditIsOpen(false)}
+        headerText="Edit Todo"
+        title="Title"
+      />
+
+      {/* Delete Todo Modal */}
+      <CustomModalDelete
+        isOpen={openDeleteModal}
+        setOpen={() => setOpenDeleteModal(false)}
+        handleOnPress={handleDeleteOnPress}
+        text="Are you sure you want to delete this todo?"
+      />
+
       {completedTodos > 0 ? (
-        <Button
-          onPress={() =>
-            navigation.navigate("CompletedTodos", { title: title })
+        <CustomButton
+          title="Check Completed Todos"
+          handleOnPress={() =>
+            navigation.navigate("CompletedTodos", { title: listTitle })
           }
-          w="100%"
-          _text={{ fontSize: "15" }}
-          mt="3%"
-        >
-          Check Completed Todos
-        </Button>
+        />
       ) : null}
 
-      <Modal isOpen={isOpen} onClose={() => setOpen(false)}>
-        <Modal.Content maxWidth="350">
-          <Modal.CloseButton />
-          <Modal.Header>Enter new Todo</Modal.Header>
-          <Modal.Body>
-            <FormControl>
-              <FormControl.Label>Title</FormControl.Label>
-              <Input value={todoName} onChangeText={setTodoName} />
-            </FormControl>
-            <FormControl>
-              <FormControl.Label>Description</FormControl.Label>
-              <Input
-                value={todoDescription}
-                onChangeText={setTodoDescription}
-              />
-            </FormControl>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="ghost"
-                colorScheme="blueGray"
-                onPress={() => {
-                  setOpen(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onPress={() => {
-                  onAddTodo();
-                }}
-              >
-                Save
-              </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
-
-      <Modal
-        isOpen={EditIsOpen}
-        onClose={() => setEditIsOpen(false)}
-        safeAreaTop={true}
-      >
-        <Modal.Content maxWidth="350">
-          <Modal.CloseButton />
-          <Modal.Header>Edit Todo</Modal.Header>
-          <Modal.Body>
-            <FormControl>
-              <FormControl.Label>Name</FormControl.Label>
-              <Input value={todoName} onChangeText={setTodoName} />
-            </FormControl>
-            <FormControl>
-              <FormControl.Label>Description</FormControl.Label>
-              <Input
-                value={todoDescription}
-                onChangeText={setTodoDescription}
-              />
-            </FormControl>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="ghost"
-                colorScheme="blueGray"
-                onPress={() => {
-                  setEditIsOpen(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onPress={() => {
-                  store.dispatch(
-                    editTodo({
-                      id: todoId,
-                      listName: title,
-                      title: todoName,
-                      description: todoDescription,
-                    })
-                  );
-                  setTodoName("");
-                  setTodoDescription("");
-                  setEditIsOpen(false);
-                }}
-              >
-                Save
-              </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
-
-      <Modal isOpen={openDeleteModal} onClose={() => setOpenDeleteModal(false)} safeAreaTop={true}>
-        <Modal.Content maxWidth="350">
-          <Modal.CloseButton />
-          <Modal.Body>
-            <Text fontSize="18" fontWeight="bold" mr={4} alignSelf="center" >
-            Are you sure you want to delete this todo?
-            </Text>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="ghost"
-                colorScheme="blueGray"
-                onPress={() => {
-                  setOpenDeleteModal(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onPress={() => {
-                  store.dispatch(
-                    removeTodo({
-                      id: todoId,
-                      listName: title,
-                    })
-                  );
-                  
-                  setOpenDeleteModal(false);
-                }}
-              >
-                Delete
-              </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
-
+      <CustomButton title="Add New Todo " handleOnPress={() => setOpen(true)} />
     </Container>
   );
 };

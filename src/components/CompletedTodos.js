@@ -8,13 +8,12 @@ import {
   Icon,
   IconButton,
   Divider,
-  Modal,
-  Button,
 } from "native-base";
 import { useSelector } from "react-redux";
 import { AntDesign, Entypo } from "@expo/vector-icons";
 import { store } from "../redux/store";
 import { removeCompletedTodo, removeTodo } from "../redux/slices/generalSlice";
+import CustomModalDelete from "./custom/CustomModalDelete";
 
 const CompletedTodos = ({ route }) => {
   const todos = useSelector((state) => state?.general?.list);
@@ -27,8 +26,8 @@ const CompletedTodos = ({ route }) => {
     ?.todos;
 
   const onDeleteTodo = (id) => {
-    setOpenDeleteModal(true)
-    setTodoId(id)
+    setOpenDeleteModal(true);
+    setTodoId(id);
   };
 
   const onRemoveCompleteTodo = (todo) => {
@@ -40,8 +39,18 @@ const CompletedTodos = ({ route }) => {
     );
   };
 
+  const handleDeleteOnPress = () => {
+    store.dispatch(
+      removeTodo({
+        id: todoId,
+        listName: title,
+      })
+    );
+    setOpenDeleteModal(false);
+  };
+
   return (
-    <Container w="100%" mt={10} ml={10}>
+    <Container w="100%" ml={10}>
       <Text fontSize="2xl" fontWeight="bold" mb={5} alignSelf="center">
         Completed Todos
       </Text>
@@ -116,42 +125,13 @@ const CompletedTodos = ({ route }) => {
         })}
       </ScrollView>
 
-      <Modal isOpen={openDeleteModal} onClose={() => setOpenDeleteModal(false)} safeAreaTop={true}>
-        <Modal.Content maxWidth="350">
-          <Modal.CloseButton />
-          <Modal.Body>
-            <Text fontSize="18" fontWeight="bold" mr={4} alignSelf="center" >
-            Are you sure you want to delete this todo?
-            </Text>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="ghost"
-                colorScheme="blueGray"
-                onPress={() => {
-                  setOpenDeleteModal(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onPress={() => {
-                  store.dispatch(
-                    removeTodo({
-                      id: todoId,
-                      listName: title,
-                    })
-                  );
-                  setOpenDeleteModal(false);
-                }}
-              >
-                Delete
-              </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
+      {/* Delete Todo Modal */}
+      <CustomModalDelete
+        isOpen={openDeleteModal}
+        setOpen={() => setOpenDeleteModal(false)}
+        handleOnPress={handleDeleteOnPress}
+        text="Are you sure you want to delete this todo?"
+      />
     </Container>
   );
 };
