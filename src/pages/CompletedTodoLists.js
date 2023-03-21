@@ -1,6 +1,10 @@
+// REACT
 import React, { useState } from "react";
+// REDUX
+import { store } from "../redux/store";
 import { useSelector } from "react-redux";
-
+import { removeCompleteList, removeList } from "../redux/slices/generalSlice";
+// STYLE
 import {
   Container,
   Text,
@@ -11,9 +15,8 @@ import {
   IconButton,
   Icon,
 } from "native-base";
-import { store } from "../redux/store";
-import { removeCompleteList, removeList } from "../redux/slices/generalSlice";
 import { AntDesign } from "@expo/vector-icons";
+// COMPONENTS
 import CustomModalDelete from "../components/custom/CustomModalDelete";
 
 const CompletedTodoLists = ({ navigation }) => {
@@ -22,12 +25,12 @@ const CompletedTodoLists = ({ navigation }) => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [listId, setListId] = useState("");
 
-  const deleteList = (id) => {
+  const deleteCompletedList = (id) => {
     setOpenDeleteModal(true);
     setListId(id);
   };
 
-  const onRemoveCompleteList = (id) => {
+  const removeCompletedList = (id) => {
     store.dispatch(
       removeCompleteList({
         id: id,
@@ -35,14 +38,14 @@ const CompletedTodoLists = ({ navigation }) => {
     );
   };
 
-  const onPressHandle = (e) => {
+  const handlePressable = (e) => {
     const val = e.target._internalFiberInstanceHandleDEV.child.memoizedProps;
     navigation.navigate("CompletedTodos", {
       listTitle: val,
     });
   };
 
-  const handleDeleteOnPress = () => {
+  const handleDeleteList = () => {
     store.dispatch(
       removeList({
         id: listId,
@@ -80,7 +83,7 @@ const CompletedTodoLists = ({ navigation }) => {
                 borderRadius={10}
               >
                 <Pressable
-                  onPress={onPressHandle}
+                  onPress={handlePressable}
                   flexDirection="row"
                   key={index}
                   w="63%"
@@ -100,7 +103,7 @@ const CompletedTodoLists = ({ navigation }) => {
                 <HStack pl={5}>
                   <IconButton
                     key={index + 1}
-                    onPress={() => onRemoveCompleteList(todoList.id)}
+                    onPress={() => removeCompletedList(todoList.id)}
                     icon={
                       <Icon as={AntDesign} name="back" color="coolGray.800" />
                     }
@@ -108,7 +111,7 @@ const CompletedTodoLists = ({ navigation }) => {
                   <IconButton
                     key={index + 3}
                     onPress={() => {
-                      deleteList(todoList.id);
+                      deleteCompletedList(todoList.id);
                     }}
                     icon={
                       <Icon as={AntDesign} name="delete" color="coolGray.800" />
@@ -124,7 +127,7 @@ const CompletedTodoLists = ({ navigation }) => {
       <CustomModalDelete
         isOpen={openDeleteModal}
         setOpen={() => setOpenDeleteModal(false)}
-        handleOnPress={handleDeleteOnPress}
+        handleOnPress={handleDeleteList}
         text="Are you sure you want to delete this list?"
       />
     </Container>

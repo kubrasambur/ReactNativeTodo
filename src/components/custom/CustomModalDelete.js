@@ -1,5 +1,7 @@
-import { Modal, Button, Text } from "native-base";
+// REACT
 import React from "react";
+// STYLE
+import { Modal, Button, Text } from "native-base";
 
 const CustomModalDelete = ({
   isOpen,

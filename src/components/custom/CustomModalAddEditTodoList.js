@@ -1,4 +1,6 @@
+// REACT
 import React from "react";
+// STYLE
 import { Modal, Button, FormControl, Input } from "native-base";
 
 const CustomModalAddEditTodoList = ({

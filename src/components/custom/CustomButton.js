@@ -1,6 +1,6 @@
-//REACT
+// REACT
 import React from "react";
-//NATIVE-BASE
+// STYLE
 import { Button } from "native-base";
 
 const CustomButton = ({ title, handleOnPress }) => {

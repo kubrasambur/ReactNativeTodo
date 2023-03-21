@@ -1,4 +1,10 @@
+// REACT
 import React, { useState } from "react";
+// REDUX
+import { store } from "../redux/store";
+import { useSelector } from "react-redux";
+import { removeCompletedTodo, removeTodo } from "../redux/slices/generalSlice";
+// STYLE
 import {
   Container,
   ScrollView,
@@ -9,10 +15,8 @@ import {
   IconButton,
   Divider,
 } from "native-base";
-import { useSelector } from "react-redux";
-import { AntDesign, Entypo } from "@expo/vector-icons";
-import { store } from "../redux/store";
-import { removeCompletedTodo, removeTodo } from "../redux/slices/generalSlice";
+import { AntDesign } from "@expo/vector-icons";
+// COMPONENTS
 import CustomModalDelete from "../components/custom/CustomModalDelete";
 
 const CompletedTodos = ({ route }) => {
@@ -25,12 +29,12 @@ const CompletedTodos = ({ route }) => {
   const data = todos?.filter((todo) => todo?.title === title || listTitle)[0]
     ?.todos;
 
-  const onDeleteTodo = (id) => {
+  const deleteCompletedTodo = (id) => {
     setOpenDeleteModal(true);
     setTodoId(id);
   };
 
-  const onRemoveCompleteTodo = (todo) => {
+  const removeCompletedTodos = (todo) => {
     store.dispatch(
       removeCompletedTodo({
         id: todo.id,
@@ -87,7 +91,7 @@ const CompletedTodos = ({ route }) => {
                   </Text>
                   <HStack>
                     <IconButton
-                      onPress={() => onRemoveCompleteTodo(todo)}
+                      onPress={() => removeCompletedTodos(todo)}
                       icon={
                         <Icon as={AntDesign} name="back" color="coolGray.800" />
                       }
@@ -95,7 +99,7 @@ const CompletedTodos = ({ route }) => {
 
                     <IconButton
                       onPress={() => {
-                        onDeleteTodo(todo.id);
+                        deleteCompletedTodo(todo.id);
                       }}
                       icon={
                         <Icon

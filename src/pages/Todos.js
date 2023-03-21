@@ -1,8 +1,17 @@
 // REACT
 import React, { useState } from "react";
 // REDUX
+import { store } from "../redux/store";
 import { useSelector } from "react-redux";
-//NATIVE-BASE
+import {
+  addTodo,
+  completeTodo,
+  removeTodo,
+  editTodo,
+} from "../redux/slices/generalSlice";
+// LIBRARY
+import uuid from "react-native-uuid";
+// STYLE
 import {
   VStack,
   Text,
@@ -13,22 +22,17 @@ import {
   Icon,
   IconButton,
 } from "native-base";
-import { store } from "../redux/store";
-import {
-  addTodo,
-  completeTodo,
-  removeTodo,
-  editTodo,
-} from "../redux/slices/generalSlice";
-import uuid from "react-native-uuid";
 import { AntDesign, Entypo } from "@expo/vector-icons";
+// NAVIGATION
 import { useNavigation } from "@react-navigation/native";
+// COMPONENTS
 import CustomModalAddEditTodo from "../components/custom/CustomModalAddEditTodo";
 import CustomModalDelete from "../components/custom/CustomModalDelete";
 import CustomButton from "../components/custom/CustomButton";
 
 const Todos = ({ route }) => {
   const todos = useSelector((state) => state?.general?.list);
+
   const { listTitle } = route.params;
 
   const navigation = useNavigation();
@@ -42,7 +46,9 @@ const Todos = ({ route }) => {
 
   const data = todos?.filter((todo) => todo?.title === listTitle)[0]?.todos;
 
-  const onAddTodo = () => {
+  const completedTodos = data.filter((todo) => todo?.completed === true).length;
+
+  const handleAddTodo = () => {
     if (!todoName) return alert("Please enter a todo");
     else {
       setOpen(false);
@@ -60,12 +66,12 @@ const Todos = ({ route }) => {
     }
   };
 
-  const onDeleteTodo = (id) => {
+  const deleteTodo = (id) => {
     setOpenDeleteModal(true);
     setTodoId(id);
   };
 
-  const onCompleteTodo = (todo) => {
+  const completeTodos = (todo) => {
     store.dispatch(
       completeTodo({
         id: todo?.id,
@@ -74,7 +80,7 @@ const Todos = ({ route }) => {
     );
   };
 
-  const onEditTodo = (todo) => {
+  const editTodo = (todo) => {
     if (todo.completed) {
       alert("You can't edit completed todo");
     } else {
@@ -109,8 +115,6 @@ const Todos = ({ route }) => {
 
     setOpenDeleteModal(false);
   };
-
-  const completedTodos = data.filter((todo) => todo?.completed === true).length;
 
   return (
     <Container w="100%" ml={10} display="flex" flex={1} alignItems="center">
@@ -154,7 +158,7 @@ const Todos = ({ route }) => {
                   </Text>
                   <HStack>
                     <IconButton
-                      onPress={() => onCompleteTodo(todo)}
+                      onPress={() => completeTodos(todo)}
                       icon={
                         <Icon
                           as={AntDesign}
@@ -164,14 +168,14 @@ const Todos = ({ route }) => {
                       }
                     />
                     <IconButton
-                      onPress={() => onEditTodo(todo)}
+                      onPress={() => editTodo(todo)}
                       icon={
                         <Icon as={Entypo} name="edit" color="coolGray.800" />
                       }
                     />
                     <IconButton
                       onPress={() => {
-                        onDeleteTodo(todo.id);
+                        deleteTodo(todo.id);
                       }}
                       icon={
                         <Icon
@@ -208,7 +212,7 @@ const Todos = ({ route }) => {
         firstOnChangeText={setTodoName}
         secondValue={todoDescription}
         secondOnChangeText={setTodoDescription}
-        handleOnPress={onAddTodo}
+        handleOnPress={handleAddTodo}
         isOpen={open}
         setOpen={() => setOpen(false)}
         headerText="Enter new Todo"

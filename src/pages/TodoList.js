@@ -9,7 +9,9 @@ import {
   editListName,
   removeList,
 } from "../redux/slices/generalSlice";
-// NATIVE-BASE
+// LIBRARY
+import uuid from "react-native-uuid";
+// STYLE
 import {
   Text,
   Pressable,
@@ -20,9 +22,8 @@ import {
   HStack,
   VStack,
 } from "native-base";
-// ID GENERATOR
-import uuid from "react-native-uuid";
 import { AntDesign, Entypo } from "@expo/vector-icons";
+// COMPONENTS
 import CustomModalAddEditTodoList from "../components/custom/CustomModalAddEditTodoList";
 import CustomModalDelete from "../components/custom/CustomModalDelete";
 import CustomButton from "../components/custom/CustomButton";
@@ -36,6 +37,10 @@ const TodoList = ({ navigation }) => {
   const [listId, setListId] = useState("");
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
+  const completedList = todoLists.filter(
+    (todoList) => todoList.completed === true
+  ).length;
+
   const onPressHandle = (e) => {
     const val = e.target._internalFiberInstanceHandleDEV.child.memoizedProps;
     navigation.navigate("Todos", {
@@ -48,7 +53,7 @@ const TodoList = ({ navigation }) => {
     setListId(id);
   };
 
-  const onEditListName = (todoList) => {
+  const editListName = (todoList) => {
     if (todoList.completed) {
       alert("You can't edit a completed list");
     } else {
@@ -64,16 +69,13 @@ const TodoList = ({ navigation }) => {
     }
   };
 
-  const onCompleteList = (id) => {
+  const completeList = (id) => {
     store.dispatch(
       completeList({
         id: id,
       })
     );
   };
-  const completedList = todoLists.filter(
-    (todoList) => todoList.completed === true
-  ).length;
 
   const onSaveTodoList = () => {
     if (listName === "") {
@@ -172,13 +174,13 @@ const TodoList = ({ navigation }) => {
                 >
                   <IconButton
                     key={index + 2}
-                    onPress={() => onEditListName(todoList)}
+                    onPress={() => editListName(todoList)}
                     icon={<Icon as={Entypo} name="edit" color="coolGray.800" />}
                   />
 
                   <IconButton
                     key={index + 1}
-                    onPress={() => onCompleteList(todoList.id)}
+                    onPress={() => completeList(todoList.id)}
                     icon={
                       <Icon
                         as={AntDesign}
