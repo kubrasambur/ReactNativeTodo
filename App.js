@@ -1,5 +1,5 @@
 import { NativeBaseProvider } from "native-base";
-import AddTodoButton from "./src/components/custom/CustomButton";
+import CustomButton from "./src/components/custom/CustomButton";
 import Todos from "./src/pages/Todos";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -26,7 +26,7 @@ export default function App() {
             }}
           >
             <Stack.Screen name="Todos" component={Todos} />
-            <Stack.Screen name="AddTodoButton" component={AddTodoButton} />
+            <Stack.Screen name="CustomButton" component={CustomButton} />
             <Stack.Screen name="TodoLists" component={TodoList} />
             <Stack.Screen
               name="CompletedTodoLists"
