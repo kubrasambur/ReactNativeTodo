@@ -1,13 +1,12 @@
 import { NativeBaseProvider } from "native-base";
-import AddTodoButton from "./src/components/custom/CustomButton";
 import Todos from "./src/pages/Todos";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import TodoList from "./src/pages/TodoList";
 import { Provider } from "react-redux";
 import { store } from "./src/redux/store";
-import CompletedTodos from "./src/components/CompletedTodos";
-import CompletedTodoLists from "./src/components/CompletedTodoLists";
+import CompletedTodos from "./src/pages/CompletedTodos";
+import CompletedTodoLists from "./src/pages/CompletedTodoLists";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -26,7 +25,6 @@ export default function App() {
             }}
           >
             <Stack.Screen name="Todos" component={Todos} />
-            <Stack.Screen name="AddTodoButton" component={AddTodoButton} />
             <Stack.Screen name="TodoLists" component={TodoList} />
             <Stack.Screen
               name="CompletedTodoLists"

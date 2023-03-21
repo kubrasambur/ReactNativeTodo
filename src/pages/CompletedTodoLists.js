@@ -14,7 +14,7 @@ import {
 import { store } from "../redux/store";
 import { removeCompleteList, removeList } from "../redux/slices/generalSlice";
 import { AntDesign } from "@expo/vector-icons";
-import CustomModalDelete from "./custom/CustomModalDelete";
+import CustomModalDelete from "../components/custom/CustomModalDelete";
 
 const CompletedTodoLists = ({ navigation }) => {
   const todoLists = useSelector((state) => state?.general?.list);

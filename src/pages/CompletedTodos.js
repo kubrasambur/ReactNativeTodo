@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import { AntDesign, Entypo } from "@expo/vector-icons";
 import { store } from "../redux/store";
 import { removeCompletedTodo, removeTodo } from "../redux/slices/generalSlice";
-import CustomModalDelete from "./custom/CustomModalDelete";
+import CustomModalDelete from "../components/custom/CustomModalDelete";
 
 const CompletedTodos = ({ route }) => {
   const todos = useSelector((state) => state?.general?.list);

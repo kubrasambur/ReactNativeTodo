@@ -13,7 +13,7 @@ const CustomModalDelete = ({
       <Modal.Content maxWidth="350">
         <Modal.CloseButton />
         <Modal.Body>
-          <Text fontSize="18" fontWeight="bold" mr={4} alignSelf="center">
+          <Text fontSize="18" fontWeight="bold" mr={6} alignSelf="center">
             {text}
           </Text>
         </Modal.Body>

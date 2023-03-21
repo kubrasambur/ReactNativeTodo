@@ -1,7 +1,7 @@
 //REACT
 import React from "react";
 //NATIVE-BASE
-import { Button, Container } from "native-base";
+import { Button } from "native-base";
 
 const CustomButton = ({ title, handleOnPress }) => {
   return (
