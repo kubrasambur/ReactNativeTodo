@@ -98,6 +98,10 @@ export const generalSlice = createSlice({
         }
       });
     },
+    setAsyncStorage: (state, action) => {
+      console.log("action.payload", action.payload);
+      state.list = action.payload;
+    },
   },
 });
 
@@ -112,6 +116,7 @@ export const {
   editListName,
   removeCompletedTodo,
   removeCompleteList,
+  setAsyncStorage,
 } = generalSlice.actions;
 
 export default generalSlice.reducer;

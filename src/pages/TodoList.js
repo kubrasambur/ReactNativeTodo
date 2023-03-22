@@ -1,10 +1,11 @@
 // REACT
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // REDUX
 import { useSelector } from "react-redux";
 import { store } from "../redux/store";
 import {
   addList,
+  setAsyncStorage,
   completeList,
   editListName,
   removeList,
@@ -27,9 +28,11 @@ import { AntDesign, Entypo } from "@expo/vector-icons";
 import CustomModalAddEditTodoList from "../components/custom/CustomModalAddEditTodoList";
 import CustomModalDelete from "../components/custom/CustomModalDelete";
 import CustomButton from "../components/custom/CustomButton";
+import { getData, removeItem, StoreData } from "../helper/AsyncStorage";
 
 const TodoList = ({ navigation }) => {
   const todoLists = useSelector((state) => state?.general?.list);
+  console.log("todoLists", todoLists);
 
   const [open, setOpen] = useState(false);
   const [listName, setListName] = useState("");
@@ -89,6 +92,16 @@ const TodoList = ({ navigation }) => {
           completed: false,
         })
       );
+
+      StoreData([
+        ...todoLists,
+        {
+          id: uuid.v4(),
+          title: listName,
+          todos: [],
+          completed: false,
+        },
+      ]);
       setListName("");
     }
   };
@@ -110,8 +123,15 @@ const TodoList = ({ navigation }) => {
         id: listId,
       })
     );
+    removeItem(listId);
+
     setOpenDeleteModal(false);
   };
+
+  useEffect(() => {
+    getData();
+    console.log("getData()", getData());
+  }, []);
 
   return (
     <Container ml={10} display="flex" flex={1} alignItems="center">
