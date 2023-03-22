@@ -37,14 +37,13 @@ const TodoList = ({ navigation }) => {
   const [listId, setListId] = useState("");
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-  const completedList = todoLists.filter(
-    (todoList) => todoList.completed === true
+  const completedList = todoLists?.filter(
+    (todoList) => todoList?.completed === true
   ).length;
 
-  const onPressHandle = (e) => {
-    const val = e.target._internalFiberInstanceHandleDEV.child.memoizedProps;
+  const onPressHandle = (listsName) => {
     navigation.navigate("Todos", {
-      listTitle: val,
+      listTitle: listsName,
     });
   };
 
@@ -53,7 +52,7 @@ const TodoList = ({ navigation }) => {
     setListId(id);
   };
 
-  const editListName = (todoList) => {
+  const editListsName = (todoList) => {
     if (todoList.completed) {
       alert("You can't edit a completed list");
     } else {
@@ -69,10 +68,10 @@ const TodoList = ({ navigation }) => {
     }
   };
 
-  const completeList = (id) => {
+  const completeLists = (id) => {
     store.dispatch(
       completeList({
-        id: id,
+        id,
       })
     );
   };
@@ -126,7 +125,7 @@ const TodoList = ({ navigation }) => {
               <VStack
                 display="flex"
                 flexDirection="row"
-                w="60%"
+                w="61%"
                 alignItems="center"
                 key={index + 4}
                 bg="violet.200"
@@ -140,7 +139,7 @@ const TodoList = ({ navigation }) => {
                 mb={2}
               >
                 <Pressable
-                  onPress={onPressHandle}
+                  onPress={() => onPressHandle(todoList.title)}
                   flexDirection="row"
                   key={index}
                 >
@@ -174,13 +173,13 @@ const TodoList = ({ navigation }) => {
                 >
                   <IconButton
                     key={index + 2}
-                    onPress={() => editListName(todoList)}
+                    onPress={() => editListsName(todoList)}
                     icon={<Icon as={Entypo} name="edit" color="coolGray.800" />}
                   />
 
                   <IconButton
                     key={index + 1}
-                    onPress={() => completeList(todoList.id)}
+                    onPress={() => completeLists(todoList.id)}
                     icon={
                       <Icon
                         as={AntDesign}

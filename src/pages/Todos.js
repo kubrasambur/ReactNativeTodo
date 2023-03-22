@@ -80,7 +80,7 @@ const Todos = ({ route }) => {
     );
   };
 
-  const editTodo = (todo) => {
+  const handleEditTodo = (todo) => {
     if (todo.completed) {
       alert("You can't edit completed todo");
     } else {
@@ -168,7 +168,7 @@ const Todos = ({ route }) => {
                       }
                     />
                     <IconButton
-                      onPress={() => editTodo(todo)}
+                      onPress={() => handleEditTodo(todo)}
                       icon={
                         <Icon as={Entypo} name="edit" color="coolGray.800" />
                       }
